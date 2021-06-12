@@ -5,6 +5,7 @@ from flask import Flask, Response, request
 from helloworld.flaskrun import flaskrun
 from flask_cors import CORS
 import boto3
+from datetime import datetime
 
 application = Flask(__name__)
 
@@ -34,7 +35,7 @@ currency_rate = {
 def post_currency(currency):
     res = currency_rate.get(currency, 0.00) 
     return Response(json.dumps({currency: res}), mimetype='application/json', status=200)
-
+#curl http://localhost:8000/calc/currency/usd
 
 
 @application.route('/calc/bit', methods=['GET'])
@@ -42,11 +43,12 @@ def post_currency_bit():
     return Response(json.dumps(get_bitcoin_index()), mimetype='application/json', status=200)
 
 
-
 def get_bitcoin_index():
     url = 'https://api.coindesk.com/v1/bpi/currentprice.json'
     response = requests.get(url).json()['bpi']['USD']
     return response
+#curl http://localhost:8000/calc/bit
+
 
 
 # return generic data
@@ -68,7 +70,7 @@ generic_data = [
     }
    ]
    
- 
+ #curl http://localhost:8000/get_generic
  
 ######### Lecture 6  ########
 
@@ -169,6 +171,25 @@ def get_frm_rec():
     return Response(json.dumps(str(resp)), mimetype='application/json', status=200)
 #curl -i http://"localhost:8000/get_form_record?frm_id=frm4&form_type=finance"
 #return resp is enough
+
+
+######### Lecture 8 S3  ########
+
+@application.route('/create_txt', methods=['GET'])
+def create_txt():
+    s3 = boto3.resource('s3', region_name='us-east-1')
+    date_time = datetime.now()
+    dt_string = date_time.strftime("%d-%m-%Y %H-%M-%S")
+    filename = "%s.txt" % dt_string
+
+    print("Today's date:", filename)
+    object = s3.Object('aws-lesson8-s3-upload-bucket', filename)
+    resp = object.put(Body="")
+    return Response(json.dumps(str(resp)), mimetype='application/json', status=200)
+
+
+
+
 
     
 if __name__ == '__main__':
