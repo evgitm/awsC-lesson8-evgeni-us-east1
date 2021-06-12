@@ -173,7 +173,7 @@ def get_frm_rec():
 #return resp is enough
 
 
-######### Lecture 8 S3  ########
+######### Homework Lecture 8 S3  ########
 
 @application.route('/create_txt', methods=['GET'])
 def create_txt():
@@ -186,9 +186,30 @@ def create_txt():
     object = s3.Object('aws-lesson8-s3-upload-bucket', filename)
     resp = object.put(Body="")
     return Response(json.dumps(str(resp)), mimetype='application/json', status=200)
+    #curl http://localhost:8000/create_txt
 
 
 
+######### Homework Lecture 9 Image Rekognition  ########
+# curl localhost:8000/analyze/aws-lesson9-rekognition-s3-upload/man.jpg    
+@application.route('/analyze/<bucket>/<image>', methods=['GET'])
+def analyze(bucket='aws-lesson9-rekognition-s3-upload', image='person.jpg'):
+    return detect_labels(bucket, image)
+def detect_labels(bucket, key, max_labels=3, min_confidence=90, region="us-east-1"):
+    rekognition = boto3.client("rekognition", region)
+    s3 = boto3.resource('s3', region_name = 'us-east-1')
+    
+    image = s3.Object(bucket, key) # Get an Image from S3
+    img_data = image.get()['Body'].read() # Read the image
+    
+    response = rekognition.detect_labels(
+        Image={
+            'Bytes': img_data
+        },
+        MaxLabels=max_labels,
+		MinConfidence=min_confidence,
+    )
+    return json.dumps(response['Labels'])
 
 
     
