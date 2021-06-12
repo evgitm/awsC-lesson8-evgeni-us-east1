@@ -46,7 +46,7 @@ local computer. If you haven't, do that first. You can find instructions in the 
 
 2. Activate the virtual environment:
 
-        $ activate ./venv/bin/activate
+        $ . .venv/bin/activate
 
 3. Install Python dependencies for this project:
 
